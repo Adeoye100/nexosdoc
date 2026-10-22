@@ -1,0 +1,2635 @@
+#!/usr/bin/env python3
+"""
+Nexos Documentation Generator - Humanized, Compact Images & Responsive Edition
+"""
+
+HTML_CONTENT = r'''<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexos: Architecture and Engineering Documentation</title>
+  <meta name="description" content="Technical documentation for Nexos, an offline-first productivity app with Yjs CRDT sync, IndexedDB persistence, and developer workflows.">
+  <meta name="robots" content="noindex">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    (function () {
+      try {
+        var savedTheme = localStorage.getItem('nexos-theme');
+        var theme = (savedTheme === 'light' || savedTheme === 'dark') ? savedTheme : 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+
+  <style>
+    :root {
+      --font-sans: 'DM Sans', 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+
+      /* Dark Theme (Gruvbox Dark) */
+      --bg-canvas: #1d2021;
+      --bg-surface: #282828;
+      --bg-surface-elevated: #32302f;
+      --bg-surface-hover: #3c3836;
+      --bg-surface-subtle: rgba(255, 255, 255, 0.04);
+      --bg-glass: rgba(29, 32, 33, 0.90);
+
+      --text-main: #ebdbb2;
+      --text-muted: #d5c4a1;
+      --text-dim: #a89984;
+      --text-inverse: #1d2021;
+
+      --border-subtle: #3c3836;
+      --border-medium: #504945;
+      --border-focus: #fabd2f;
+
+      --accent-primary: #fabd2f;
+      --accent-primary-subtle: rgba(250, 189, 47, 0.15);
+      --accent-cyan: #8ec07c;
+      --accent-cyan-subtle: rgba(142, 192, 124, 0.15);
+      --accent-emerald: #b8bb26;
+      --accent-emerald-subtle: rgba(184, 187, 38, 0.15);
+      --accent-indigo: #83a598;
+      --accent-amber: #fe8019;
+      --accent-rose: #fb4934;
+
+      --code-bg: #161819;
+      --code-border: #3c3836;
+
+      --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.45);
+      --shadow-lg: 0 10px 18px -3px rgba(0, 0, 0, 0.55);
+
+      --sidebar-width: 280px;
+      --toc-width: 240px;
+      --header-height: 60px;
+    }
+
+    /* Light Theme (Gruvbox Light) */
+    :root[data-theme="light"] {
+      --bg-canvas: #fbf1c7;
+      --bg-surface: #f9f5d7;
+      --bg-surface-elevated: #f2e5bc;
+      --bg-surface-hover: #ebdbb2;
+      --bg-surface-subtle: rgba(0, 0, 0, 0.03);
+      --bg-glass: rgba(251, 241, 199, 0.92);
+
+      --text-main: #282828;
+      --text-muted: #504945;
+      --text-dim: #7c6f64;
+      --text-inverse: #fbf1c7;
+
+      --border-subtle: #d5c4a1;
+      --border-medium: #bdae93;
+      --border-focus: #d79921;
+
+      --accent-primary: #d79921;
+      --accent-primary-subtle: rgba(215, 153, 33, 0.16);
+      --accent-cyan: #458588;
+      --accent-cyan-subtle: rgba(69, 133, 136, 0.15);
+      --accent-emerald: #98971a;
+      --accent-emerald-subtle: rgba(152, 151, 26, 0.15);
+      --accent-indigo: #458588;
+      --accent-amber: #d65d0e;
+      --accent-rose: #cc241d;
+
+      --code-bg: #ede0b8;
+      --code-border: #d5c4a1;
+
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.12);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    a {
+      color: var(--accent-primary);
+      text-decoration: none;
+      transition: color 0.15s ease, opacity 0.15s ease;
+    }
+
+    a:hover {
+      opacity: 0.85;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: inherit;
+    }
+
+    svg {
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--border-focus);
+      outline-offset: 2px;
+    }
+
+    .skip-to-content {
+      position: absolute;
+      top: -120px;
+      left: 1.5rem;
+      background: var(--accent-primary);
+      color: var(--text-inverse);
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 700;
+      z-index: 10000;
+      border-radius: 6px;
+      transition: top 0.2s ease;
+    }
+    .skip-to-content:focus {
+      top: 1rem;
+    }
+
+    /* Top Header */
+    .top-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      height: var(--header-height);
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.25rem;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      padding: 0.45rem;
+      border-radius: 6px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-main);
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-icon-box {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      background: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-inverse);
+      font-weight: 800;
+      font-size: 0.95rem;
+      font-family: var(--font-mono);
+    }
+
+    .brand-text-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      line-height: 1.15;
+    }
+
+    .brand-subtitle {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+    }
+
+    .header-center {
+      display: flex;
+      align-items: center;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      background: var(--accent-primary-subtle);
+      color: var(--accent-primary);
+      border: 1px solid rgba(250, 189, 47, 0.25);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .search-trigger-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.35rem 0.75rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: border-color 0.15s ease;
+    }
+
+    .search-trigger-btn:hover {
+      border-color: var(--accent-primary);
+      color: var(--text-main);
+    }
+
+    .kbd-shortcut {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-dim);
+    }
+
+    .theme-toggle-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+    }
+
+    /* Layout */
+    .doc-layout {
+      display: flex;
+      min-height: calc(100vh - var(--header-height));
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+      position: sticky;
+      top: var(--header-height);
+      height: calc(100vh - var(--header-height));
+      overflow-y: auto;
+      padding: 1.25rem 0.85rem;
+      border-right: 1px solid var(--border-subtle);
+      background: var(--bg-canvas);
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+    }
+
+    .sidebar-filter-wrap {
+      position: relative;
+    }
+
+    .sidebar-filter-icon {
+      position: absolute;
+      left: 0.65rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+
+    .sidebar-filter-input {
+      width: 100%;
+      padding: 0.4rem 0.65rem 0.4rem 2rem;
+      font-size: 0.8rem;
+      font-family: inherit;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .sidebar-filter-input:focus {
+      border-color: var(--accent-primary);
+    }
+
+    .nav-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .nav-group-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      padding: 0.2rem 0.45rem;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .nav-item-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.38rem 0.55rem;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .nav-item-link:hover {
+      color: var(--text-main);
+      background: var(--bg-surface-elevated);
+    }
+
+    .nav-item-link.active {
+      color: var(--accent-primary);
+      background: var(--accent-primary-subtle);
+      border-color: rgba(250, 189, 47, 0.25);
+      font-weight: 600;
+    }
+
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      min-width: 0;
+      padding: 2rem 2.5rem 4rem 2.5rem;
+    }
+
+    .breadcrumb-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      margin-bottom: 1rem;
+    }
+
+    .doc-section {
+      margin-bottom: 3.75rem;
+      scroll-margin-top: calc(var(--header-height) + 1.25rem);
+    }
+
+    .section-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-primary);
+      margin-bottom: 0.35rem;
+    }
+
+    .doc-h1 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      color: var(--text-main);
+      margin-bottom: 0.75rem;
+      text-wrap: balance;
+    }
+
+    .doc-lead {
+      font-size: 1.05rem;
+      line-height: 1.65;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      max-width: 860px;
+    }
+
+    .doc-h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      color: var(--text-main);
+      margin-top: 1.25rem;
+      margin-bottom: 0.75rem;
+      text-wrap: balance;
+    }
+
+    p {
+      margin-bottom: 0.95rem;
+      color: var(--text-muted);
+      font-size: 0.9125rem;
+    }
+
+    strong {
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    /* Metrics Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.85rem;
+      margin: 1.25rem 0 1.85rem 0;
+    }
+
+    .metric-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 0.95rem 1.05rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .metric-number {
+      font-size: 1.6rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      color: var(--accent-primary);
+      line-height: 1.15;
+    }
+
+    .metric-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+    }
+
+    .metric-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    /* Grids & Cards */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1rem;
+      margin: 1.25rem 0;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      margin: 1.25rem 0;
+    }
+
+    .feature-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-badge {
+      display: inline-flex;
+      align-items: center;
+      align-self: flex-start;
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      background: var(--bg-surface-elevated);
+      color: var(--text-dim);
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 0.65rem;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.4rem;
+    }
+
+    .card-desc {
+      font-size: 0.835rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Callouts */
+    .callout {
+      border-radius: 6px;
+      padding: 0.95rem 1.15rem;
+      margin: 1.25rem 0;
+      border-left: 3px solid;
+      background: var(--bg-surface);
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+
+    .callout-icon {
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+
+    .callout-content {
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--text-muted);
+    }
+
+    .callout-tip {
+      border-left-color: var(--accent-emerald);
+      background: rgba(184, 187, 38, 0.08);
+    }
+    .callout-tip .callout-icon {
+      color: var(--accent-emerald);
+    }
+
+    .callout-important {
+      border-left-color: var(--accent-primary);
+      background: rgba(250, 189, 47, 0.08);
+    }
+    .callout-important .callout-icon {
+      color: var(--accent-primary);
+    }
+
+    .callout-warning {
+      border-left-color: var(--accent-amber);
+      background: rgba(254, 128, 25, 0.08);
+    }
+    .callout-warning .callout-icon {
+      color: var(--accent-amber);
+    }
+
+    .callout-danger {
+      border-left-color: var(--accent-rose);
+      background: rgba(251, 73, 52, 0.08);
+    }
+    .callout-danger .callout-icon {
+      color: var(--accent-rose);
+    }
+
+    /* Compact Diagram Viewport */
+    .diagram-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 1.5rem 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .diagram-header {
+      padding: 0.65rem 1rem;
+      background: var(--bg-surface-elevated);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+    }
+
+    .diagram-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .diagram-number {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      background: var(--accent-primary-subtle);
+      color: var(--accent-primary);
+      border: 1px solid rgba(250, 189, 47, 0.25);
+    }
+
+    .diagram-name {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .diagram-tabs {
+      display: flex;
+      gap: 0.2rem;
+      background: var(--bg-canvas);
+      padding: 0.15rem;
+      border-radius: 5px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .diagram-tab-btn {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.25rem 0.55rem;
+      border-radius: 4px;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .diagram-tab-btn.active {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .diagram-viewport {
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--code-bg);
+      height: 220px;
+      max-height: 220px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .diagram-viewport img {
+      max-width: 100%;
+      max-height: 190px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 4px;
+      cursor: zoom-in;
+      transition: transform 0.2s ease;
+    }
+
+    .diagram-viewport img:hover {
+      transform: scale(1.02);
+    }
+
+    .diagram-tab-pane {
+      display: none;
+      width: 100%;
+    }
+
+    .diagram-tab-pane.active {
+      display: block;
+    }
+
+    .diagram-zoom-hint {
+      position: absolute;
+      bottom: 0.65rem;
+      right: 0.65rem;
+      background: rgba(22, 24, 25, 0.85);
+      backdrop-filter: blur(4px);
+      color: var(--text-main);
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      padding: 0.2rem 0.45rem;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      pointer-events: none;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .diagram-footer {
+      padding: 0.85rem 1.15rem;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      font-size: 0.835rem;
+      line-height: 1.5;
+    }
+
+    .diagram-footer h4 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+      letter-spacing: 0.05em;
+      color: var(--accent-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    /* Compact Gallery Thumbnails */
+    .gallery-thumb-wrap {
+      width: 100%;
+      height: 165px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface-elevated);
+      position: relative;
+      cursor: zoom-in;
+      margin-bottom: 0.65rem;
+    }
+
+    .gallery-thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      display: block;
+      transition: transform 0.25s ease;
+    }
+
+    .gallery-thumb-wrap:hover img {
+      transform: scale(1.03);
+    }
+
+    .thumb-zoom-badge {
+      position: absolute;
+      bottom: 0.5rem;
+      right: 0.5rem;
+      background: rgba(22, 24, 25, 0.85);
+      backdrop-filter: blur(4px);
+      color: var(--text-main);
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      padding: 0.2rem 0.45rem;
+      border-radius: 4px;
+      pointer-events: none;
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    /* Tables */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 1.15rem 0;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      background: var(--bg-surface);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.835rem;
+    }
+
+    th {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      font-weight: 700;
+      padding: 0.65rem 0.85rem;
+      border-bottom: 1px solid var(--border-subtle);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 0.65rem 0.85rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      padding: 0.12rem 0.4rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .status-pill.success {
+      background: var(--accent-emerald-subtle);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(184, 187, 38, 0.3);
+    }
+
+    .status-pill.warning {
+      background: rgba(254, 128, 25, 0.15);
+      color: var(--accent-amber);
+      border: 1px solid rgba(254, 128, 25, 0.3);
+    }
+
+    .status-pill.info {
+      background: var(--accent-cyan-subtle);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(142, 192, 124, 0.3);
+    }
+
+    /* Code Blocks */
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 6px;
+      margin: 1rem 0;
+      overflow: hidden;
+      font-family: var(--font-mono);
+    }
+
+    .code-header {
+      padding: 0.4rem 0.85rem;
+      background: var(--bg-surface-elevated);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+
+    .code-copy-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    pre {
+      padding: 0.95rem;
+      overflow-x: auto;
+      font-size: 0.78rem;
+      line-height: 1.55;
+      color: var(--text-main);
+    }
+
+    code {
+      font-family: var(--font-mono);
+    }
+
+    p code, li code {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      padding: 0.12rem 0.3rem;
+      border-radius: 4px;
+      font-size: 0.8em;
+      color: var(--accent-primary);
+    }
+
+    /* Interactive Calculator */
+    .interactive-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: 8px;
+      padding: 1.35rem;
+      margin: 1.5rem 0;
+      box-shadow: var(--shadow-md);
+    }
+
+    .calc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      padding-bottom: 0.65rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .calc-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .calc-control {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .calc-control label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-dim);
+    }
+
+    .calc-input {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 5px;
+      padding: 0.45rem 0.65rem;
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .calc-input:focus {
+      border-color: var(--accent-primary);
+    }
+
+    .calc-results-panel {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.85rem;
+      align-items: center;
+    }
+
+    .calc-stat-box {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .calc-stat-val {
+      font-size: 1.45rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      color: var(--accent-primary);
+    }
+
+    .calc-stat-lbl {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+    }
+
+    .xp-progress-bar-wrap {
+      grid-column: 1 / -1;
+      margin-top: 0.35rem;
+    }
+
+    .xp-progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-surface-elevated);
+      border-radius: 9999px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .xp-progress-fill {
+      height: 100%;
+      background: var(--accent-primary);
+      width: 45%;
+      border-radius: 9999px;
+      transition: width 0.25s ease;
+    }
+
+    /* Right TOC */
+    .toc-sidebar {
+      width: var(--toc-width);
+      flex-shrink: 0;
+      position: sticky;
+      top: var(--header-height);
+      height: calc(100vh - var(--header-height));
+      overflow-y: auto;
+      padding: 1.25rem 0.75rem;
+      border-left: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .toc-title {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      padding-bottom: 0.25rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .toc-link {
+      display: block;
+      font-size: 0.75rem;
+      line-height: 1.35;
+      color: var(--text-dim);
+      padding: 0.2rem 0.45rem;
+      border-radius: 4px;
+      border-left: 2px solid transparent;
+      transition: color 0.15s ease;
+    }
+
+    .toc-link:hover {
+      color: var(--text-main);
+    }
+
+    .toc-link.active {
+      color: var(--accent-primary);
+      border-left-color: var(--accent-primary);
+      font-weight: 600;
+      background: var(--bg-surface-subtle);
+    }
+
+    .back-to-top-btn {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      padding: 0.45rem;
+      border-radius: 5px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      cursor: pointer;
+    }
+
+    /* Modal / Lightbox */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: 8px;
+      max-width: 92vw;
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-header {
+      padding: 0.75rem 1rem;
+      background: var(--bg-surface-elevated);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .modal-close-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      cursor: pointer;
+    }
+
+    .modal-body {
+      padding: 0.75rem;
+      overflow: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #141617;
+    }
+
+    .modal-body img {
+      max-width: 100%;
+      max-height: 82vh;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+
+    /* Search Modal */
+    .search-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(6px);
+      z-index: 10000;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 10vh;
+    }
+
+    .search-modal.active {
+      display: flex;
+    }
+
+    .search-box-dialog {
+      width: 100%;
+      max-width: 580px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .search-box-header {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-surface-elevated);
+    }
+
+    .search-box-input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+
+    .search-results-list {
+      list-style: none;
+      max-height: 360px;
+      overflow-y: auto;
+      padding: 0.4rem 0;
+    }
+
+    .search-result-item {
+      padding: 0.55rem 1rem;
+      transition: background-color 0.15s ease;
+    }
+
+    .search-result-item:hover, .search-result-item.selected {
+      background: var(--bg-surface-elevated);
+    }
+
+    .search-result-item a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+
+    .search-box-footer {
+      padding: 0.55rem 1rem;
+      border-top: 1px solid var(--border-subtle);
+      background: var(--bg-surface-elevated);
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Footer */
+    .page-footer {
+      border-top: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      padding: 2rem 1.25rem;
+      margin-top: auto;
+    }
+
+    .footer-inner {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-left p {
+      margin-bottom: 0;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+    }
+
+    .footer-right {
+      display: flex;
+      gap: 0.85rem;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+
+    /* Responsive Rules */
+    @media (max-width: 1200px) {
+      .toc-sidebar {
+        display: none;
+      }
+      .content-area {
+        padding: 2rem 1.5rem;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .mobile-menu-btn {
+        display: flex;
+      }
+      .header-badge {
+        display: none;
+      }
+      .sidebar {
+        position: fixed;
+        left: -320px;
+        top: var(--header-height);
+        bottom: 0;
+        z-index: 999;
+        background: var(--bg-canvas);
+        transition: left 0.25s ease;
+        box-shadow: var(--shadow-lg);
+      }
+      .sidebar.open {
+        left: 0;
+      }
+      .content-area {
+        padding: 1.5rem 1rem 3rem 1rem;
+      }
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .grid-2, .grid-3 {
+        grid-template-columns: 1fr;
+      }
+      .search-trigger-btn span:not(.kbd-shortcut) {
+        display: none;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .metrics-grid {
+        grid-template-columns: 1fr;
+      }
+      .calc-grid {
+        grid-template-columns: 1fr;
+      }
+      .calc-results-panel {
+        grid-template-columns: 1fr 1fr;
+      }
+      .top-header {
+        padding: 0 0.85rem;
+      }
+      .doc-h1 {
+        font-size: 1.75rem;
+      }
+      .doc-h2 {
+        font-size: 1.3rem;
+      }
+      .diagram-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .diagram-tabs {
+        width: 100%;
+        overflow-x: auto;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#main-doc-content" class="skip-to-content">Skip to main content</a>
+
+  <!-- Header -->
+  <header class="top-header">
+    <div class="header-left">
+      <button class="mobile-menu-btn" id="mobileMenuToggle" aria-label="Toggle navigation drawer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <a href="#" class="brand-logo" aria-label="Nexos Documentation Home">
+        <div class="brand-icon-box" aria-hidden="true">N</div>
+        <div class="brand-text-wrap">
+          <span class="brand-title">NEXOS ENGINE</span>
+          <span class="brand-subtitle">LOCAL-FIRST PRODUCTIVITY</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="header-center">
+      <div class="header-badge" role="status">
+        <svg width="7" height="7" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true">
+          <circle cx="4" cy="4" r="3"></circle>
+        </svg>
+        <span>Yjs CRDT &bull; IndexedDB &bull; PartyKit Serverless</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button class="search-trigger-btn" id="searchTriggerBtn" type="button" aria-label="Search documentation dialog">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span>Quick search…</span>
+        <span class="kbd-shortcut">⌘&nbsp;K</span>
+      </button>
+
+      <button class="theme-toggle-btn" id="themeToggleBtn" type="button" aria-label="Toggle light and dark themes">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Container -->
+  <div class="doc-layout">
+
+    <!-- Left Sidebar -->
+    <aside class="sidebar" id="mainSidebar" aria-label="Documentation navigation">
+      <div class="sidebar-filter-wrap">
+        <svg class="sidebar-filter-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="sidebarFilterInput" class="sidebar-filter-input" placeholder="Filter sections…" aria-label="Filter navigation links">
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-title">01. Overview</div>
+        <ul class="nav-list">
+          <li>
+            <a href="#section-why-built" class="nav-item-link active">
+              <span>Why Nexos was built</span>
+            </a>
+          </li>
+          <li>
+            <a href="#section-what-it-entails" class="nav-item-link">
+              <span>Capabilities and stack</span>
+            </a>
+          </li>
+          <li>
+            <a href="#section-gamification-growth" class="nav-item-link">
+              <span>XP and habit math</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-title">02. Distributed Sync</div>
+        <ul class="nav-list">
+          <li>
+            <a href="#diagram-crdt-sync" class="nav-item-link">
+              <span>01. CRDT resolution</span>
+            </a>
+          </li>
+          <li>
+            <a href="#diagram-indexeddb" class="nav-item-link">
+              <span>02. IndexedDB storage</span>
+            </a>
+          </li>
+          <li>
+            <a href="#diagram-webrtc-signaling" class="nav-item-link">
+              <span>03. PartyKit signaling</span>
+            </a>
+          </li>
+          <li>
+            <a href="#diagram-dual-mode" class="nav-item-link">
+              <span>04. Dual workspaces</span>
+            </a>
+          </li>
+          <li>
+            <a href="#diagram-ai-workflow" class="nav-item-link">
+              <span>05. AI assistant action loop</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-title">03. Interface Gallery</div>
+        <ul class="nav-list">
+          <li>
+            <a href="#section-interface-gallery" class="nav-item-link">
+              <span>Screen walkthrough</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-title">04. Data and Security</div>
+        <ul class="nav-list">
+          <li>
+            <a href="#section-security-matrix" class="nav-item-link">
+              <span>Security model and audit</span>
+            </a>
+          </li>
+          <li>
+            <a href="#section-interactive-calc" class="nav-item-link">
+              <span>Interactive XP simulator</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-title">05. Post-Mortem</div>
+        <ul class="nav-list">
+          <li>
+            <a href="#section-what-i-learned" class="nav-item-link">
+              <span>Learnings and trade-offs</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content-area" id="main-doc-content" tabindex="-1">
+
+      <nav class="breadcrumb-nav" aria-label="Breadcrumb navigation">
+        <span>Nexos</span>
+        <span>/</span>
+        <span>Specs</span>
+        <span>/</span>
+        <span>Local-First Architecture</span>
+      </nav>
+
+      <!-- Section: Why Built -->
+      <section id="section-why-built" class="doc-section">
+        <div class="section-eyebrow">
+          <span>Overview</span>
+        </div>
+        <h1 class="doc-h1">Why Nexos was built</h1>
+        <p class="doc-lead">
+          Nexos is an offline-first productivity app for developers. It combines daily habit tracking and personal growth with technical workflows like GitHub-linked Kanban boards and automated standup notes. All state stays on your device.
+        </p>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <span class="metric-number">0&nbsp;ms</span>
+            <span class="metric-label">Local write latency</span>
+            <span class="metric-sub">Mutations save to browser IndexedDB without waiting on a server.</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-number">100%</span>
+            <span class="metric-label">Offline availability</span>
+            <span class="metric-sub">Full access and editing with zero network connection.</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-number">3&nbsp;Tiers</span>
+            <span class="metric-label">Sync hierarchy</span>
+            <span class="metric-sub">BroadcastChannel between tabs, WebRTC between peers, PartyKit for signaling.</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-number">0</span>
+            <span class="metric-label">Remote database</span>
+            <span class="metric-sub">Your personal tasks and habits are never uploaded to a cloud DB.</span>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="feature-card">
+            <div class="card-badge">Friction 01</div>
+            <div class="card-title">Cloud latency and spinners</div>
+            <p class="card-desc">
+              Web apps that require network round-trips for basic status changes freeze on bad Wi-Fi. Nexos writes locally first, so edits are immediate.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="card-badge">Friction 02</div>
+            <div class="card-title">Data privacy</div>
+            <p class="card-desc">
+              Personal habits, PR discussions, and daily standups don't need to live on corporate servers. Data ownership remains entirely with you.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="card-badge">Friction 03</div>
+            <div class="card-title">Split tool fatigue</div>
+            <p class="card-desc">
+              Engineers track sprint tasks in Jira, habits in mobile apps, and notes in scratchpads. Nexos places both personal and engineering workflows under one roof.
+            </p>
+          </div>
+        </div>
+
+        <div class="callout callout-important">
+          <svg class="callout-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <div class="callout-content">
+            <strong>Core principle:</strong> Keep data local by default. Use the network only to sync between your own browser tabs and paired devices.
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Capabilities & Stack -->
+      <section id="section-what-it-entails" class="doc-section">
+        <div class="section-eyebrow">
+          <span>Stack</span>
+        </div>
+        <h2 class="doc-h2">Capabilities and technology stack</h2>
+        <p>
+          Nexos runs as a single-page React app with a Gruvbox-inspired color scheme. An ephemeral PartyKit worker handles WebSocket signaling and AI proxying.
+        </p>
+
+        <div class="table-wrap">
+          <table aria-label="Technology Stack Breakdown">
+            <thead>
+              <tr>
+                <th>Layer</th>
+                <th>Technology</th>
+                <th>Purpose</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Frontend UI</strong></td>
+                <td>React 18, Vite, Tailwind CSS</td>
+                <td>Gruvbox palette, keyboard navigation, drag-and-drop via <code>@dnd-kit</code></td>
+                <td><span class="status-pill success">Verified</span></td>
+              </tr>
+              <tr>
+                <td><strong>CRDT State</strong></td>
+                <td>Yjs (<code>y-indexeddb</code>, <code>y-webrtc</code>)</td>
+                <td>Conflict-free state resolution, binary vector updates, local storage</td>
+                <td><span class="status-pill success">Verified</span></td>
+              </tr>
+              <tr>
+                <td><strong>Signaling Server</strong></td>
+                <td>PartyKit Serverless</td>
+                <td>WebRTC handshake relay and streaming proxy for OpenRouter and Gemini</td>
+                <td><span class="status-pill warning">Shelved</span></td>
+              </tr>
+              <tr>
+                <td><strong>PWA Caching</strong></td>
+                <td><code>vite-plugin-pwa</code></td>
+                <td>Offline static asset caching and ServiceWorker registration</td>
+                <td><span class="status-pill success">Verified</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid-2">
+          <div class="feature-card">
+            <div class="card-badge">Mode 1</div>
+            <div class="card-title">Developer Mode</div>
+            <p class="card-desc">
+              Focuses on technical execution: Kanban tasks linked to GitHub PRs, automated daily standup generator, command-line snippet manager, and sprint countdowns.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="card-badge">Mode 2</div>
+            <div class="card-title">User Mode</div>
+            <p class="card-desc">
+              Focuses on personal growth: 365-day habit heatmaps, skill portfolios, quick notes bank, and XP leveling based on completed items.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Gamification Math -->
+      <section id="section-gamification-growth" class="doc-section">
+        <div class="section-eyebrow">
+          <span>Formulas</span>
+        </div>
+        <h2 class="doc-h2">XP and habit streak math</h2>
+        <p>
+          Nexos calculates experience points directly from task completion and active habit streaks. These formulas were verified in test epics <code>NEX-4</code> and <code>NEX-5</code>.
+        </p>
+
+        <div class="grid-2">
+          <div class="feature-card">
+            <div class="card-title">Task XP values</div>
+            <p class="card-desc">Points depend on task priority:</p>
+            <div class="code-block">
+              <div class="code-header">
+                <span>XP FORMULA</span>
+              </div>
+              <pre><code>High Priority    = 50 XP
+Medium Priority  = 25 XP
+Low Priority     = 10 XP
+Habit Check-in   = 15 XP + (Streak_Days &times; 2 XP)</code></pre>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="card-title">Level progression curve</div>
+            <p class="card-desc">Levels scale quadratically with total points:</p>
+            <div class="code-block">
+              <div class="code-header">
+                <span>LEVEL FORMULA</span>
+              </div>
+              <pre><code>Level = floor(sqrt(Total_XP / 100)) + 1
+Next_Threshold = (Level^2) &times; 100
+Current_Base   = ((Level - 1)^2) &times; 100</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Diagram 01 - CRDT -->
+      <section id="diagram-crdt-sync" class="doc-section">
+        <div class="section-eyebrow">
+          <span>Architecture 01</span>
+        </div>
+        <h2 class="doc-h2">01. CRDT state resolution</h2>
+        <p>
+          Conflict-Free Replicated Data Types let multiple browser tabs and devices edit tasks concurrently. Edits merge deterministically without overwriting each other.
+        </p>
+
+        <div class="diagram-panel">
+          <div class="diagram-header">
+            <div class="diagram-title-group">
+              <span class="diagram-number">DIAG-01</span>
+              <span class="diagram-name">CRDT state resolution and Yjs doc</span>
+            </div>
+            <div class="diagram-tabs" role="tablist">
+              <button class="diagram-tab-btn active" data-target="crdt-view" type="button">Diagram</button>
+              <button class="diagram-tab-btn" data-target="crdt-code" type="button">Code</button>
+            </div>
+          </div>
+
+          <div class="diagram-viewport">
+            <div class="diagram-tab-pane active" id="crdt-view">
+              <img src="./assets/CRDT.png" alt="CRDT state diagram" class="lightbox-trigger" data-title="CRDT state resolution" width="723" height="284" loading="lazy">
+              <div class="diagram-zoom-hint" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <span>Zoom</span>
+              </div>
+            </div>
+
+            <div class="diagram-tab-pane" id="crdt-code">
+              <div class="code-block" style="margin:0;">
+                <div class="code-header">
+                  <span>tasks-context.tsx</span>
+                  <button class="code-copy-btn" data-copy="export const ydoc = new Y.Doc();\nexport const yTasks = ydoc.getArray('tasks');\nyTasks.observeDeep(() => {\n  setTasks(yTasks.toArray().map(t => t.toJSON()));\n});" type="button">Copy</button>
+                </div>
+                <pre><code>import * as Y from 'yjs';
+import { IndexeddbPersistence } from 'y-indexeddb';
+
+export const ydoc = new Y.Doc();
+export const yTasks = ydoc.getArray('tasks');
+
+const provider = new IndexeddbPersistence('nexos-tasks-db', ydoc);
+
+yTasks.observeDeep(() => {
+  const tasks = yTasks.toArray().map(t => t.toJSON());
+  updateLocalState(tasks);
+});</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="diagram-footer">
+            <h4>Key takeaway</h4>
+            <p style="margin-bottom:0;">
+              Instead of sending REST requests to an API, Nexos writes mutations to in-memory Yjs shared types. Changes emit binary delta updates that sync across clients.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Diagram 02 - IndexedDB -->
+      <section id="diagram-indexeddb" class="doc-section">
+        <div class="section-eyebrow">
+          <span>Architecture 02</span>
+        </div>
+        <h2 class="doc-h2">02. IndexedDB offline persistence</h2>
+        <p>
+          The client stores Yjs binary updates in IndexedDB via <code>y-indexeddb</code>. When you open Nexos, it reads straight from disk, loading your dashboard instantly.
+        </p>
+
+        <div class="diagram-panel">
+          <div class="diagram-header">
+            <div class="diagram-title-group">
+              <span class="diagram-number">DIAG-02</span>
+              <span class="diagram-name">IndexedDB storage pipeline</span>
+            </div>
+            <div class="diagram-tabs" role="tablist">
+              <button class="diagram-tab-btn active" data-target="idb-view" type="button">Diagram</button>
+              <button class="diagram-tab-btn" data-target="idb-schema" type="button">Stores</button>
+            </div>
+          </div>
+
+          <div class="diagram-viewport">
+            <div class="diagram-tab-pane active" id="idb-view">
+              <img src="./assets/indexDB.png" alt="IndexedDB storage diagram" class="lightbox-trigger" data-title="IndexedDB storage pipeline" width="692" height="198" loading="lazy">
+              <div class="diagram-zoom-hint" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <span>Zoom</span>
+              </div>
+            </div>
+
+            <div class="diagram-tab-pane" id="idb-schema">
+              <div style="background:var(--bg-surface); padding:1rem; border-radius:6px; font-size:0.825rem;">
+                <p><strong>Primary local stores:</strong></p>
+                <ul style="margin-left:1.2rem; line-height:1.6; color:var(--text-muted);">
+                  <li><code>nexos-tasks-db</code>: IndexedDB binary updates for all tasks and columns.</li>
+                  <li><code>nexos-habits-db</code>: Daily habit check-ins and streak logs.</li>
+                  <li><code>app-mode-preference</code>: LocalStorage flag for active workspace (Developer or User).</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="diagram-footer">
+            <h4>Key takeaway</h4>
+            <p style="margin-bottom:0;">
+              Using binary delta updates in IndexedDB avoids serializing large JSON objects on every edit, keeping tab reloads fast.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Diagram 03 - Signaling -->
+      <section id="diagram-webrtc-signaling" class="doc-section">
+        <div class="section-eyebrow">
+          <span>Architecture 03</span>
+        </div>
+        <h2 class="doc-h2">03. WebRTC mesh and PartyKit signaling</h2>
+        <p>
+          Peer-to-peer sync between devices uses WebRTC data channels. A PartyKit serverless worker relays the initial SDP handshake messages, then lets the devices talk directly.
+        </p>
+
+        <div class="diagram-panel">
+          <div class="diagram-header">
+            <div class="diagram-title-group">
+              <span class="diagram-number">DIAG-03</span>
+              <span class="diagram-name">Yjs protocol and edge signaling</span>
+            </div>
+            <div class="diagram-tabs" role="tablist">
+              <button class="diagram-tab-btn active" data-target="sig-view" type="button">Diagram</button>
+              <button class="diagram-tab-btn" data-target="sig-code" type="button">Relay code</button>
+            </div>
+          </div>
+
+          <div class="diagram-viewport">
+            <div class="diagram-tab-pane active" id="sig-view">
+              <img src="./assets/Yjs.png" alt="Yjs binary protocol diagram" class="lightbox-trigger" data-title="Yjs binary protocol" width="678" height="153" loading="lazy">
+              <div class="diagram-zoom-hint" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <span>Zoom</span>
+              </div>
+            </div>
+
+            <div class="diagram-tab-pane" id="sig-code">
+              <div class="code-block" style="margin:0;">
+                <div class="code-header">
+                  <span>server.ts (PartyKit relay)</span>
+                  <button class="code-copy-btn" data-copy="onMessage(msg, sender) {\n  const data = JSON.parse(msg);\n  if (data.type === 'publish') {\n    this.party.broadcast(msg, [sender.id]);\n  }\n}" type="button">Copy</button>
+                </div>
+                <pre><code>export default class SignalingServer implements Party.Server {
+  onMessage(msg: string, sender: Party.Connection) {
+    const data = JSON.parse(msg);
+    if (data.type === 'publish') {
+      // Must exclude sender to prevent echo loops
+      this.party.broadcast(msg, [sender.id]);
+    }
+  }
+}</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="diagram-footer">
+            <h4>Key takeaway</h4>
+            <p style="margin-bottom:0;">
+              The signaling worker does not store user data. It exists only to connect peers. Once the WebRTC channel opens, traffic flows directly device-to-device.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Diagram 04 - Dual Mode -->
+      <section id="diagram-dual-mode" class="doc-section">
+        <div class="section-eyebrow">
+          <span>Architecture 04</span>
+        </div>
+        <h2 class="doc-h2">04. Dual workspace boundaries</h2>
+        <p>
+          To prevent mixing code deadlines with personal routines, Nexos splits the UI via <code>AppModeContext</code>. Toggling modes switches visible views while keeping data contexts loaded in memory.
+        </p>
+
+        <div class="grid-2">
+          <div class="feature-card">
+            <div class="card-badge">Developer Mode</div>
+            <div class="card-title">Engineering focus</div>
+            <p class="card-desc">
+              Kanban board with GitHub PR blocking flags, automated standup generator producing markdown notes, and CLI snippet repository.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="card-badge">User Mode</div>
+            <div class="card-title">Daily life &amp; habits</div>
+            <p class="card-desc">
+              Yearly habit contribution heatmap, skill portfolio leveling, goal progress tracking, and personal notes bank.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Diagram 05 - AI Workflow -->
+      <section id="diagram-ai-workflow" class="doc-section">
+        <div class="section-eyebrow">
+          <span>Architecture 05</span>
+        </div>
+        <h2 class="doc-h2">05. Context-aware AI assistant</h2>
+        <p>
+          A slide-over chat drawer sends your current task titles and priorities to Gemini or OpenRouter through an edge proxy. When the assistant suggests a change, the client executes it safely.
+        </p>
+
+        <div class="feature-card">
+          <div class="card-title">Client-side action loop</div>
+          <p class="card-desc">
+            The remote model has no direct database access. When the assistant responds with an action block, the browser verifies the payload and updates the local Yjs document:
+          </p>
+          <div class="code-block">
+            <div class="code-header">
+              <span>Action block example</span>
+            </div>
+            <pre><code>&lt;action type="create_task"&gt;
+{
+  "title": "Update PartyKit signaling relay",
+  "priority": "High",
+  "category": "Work"
+}
+&lt;/action&gt;</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Interface Gallery -->
+      <section id="section-interface-gallery" class="doc-section">
+        <div class="section-eyebrow">
+          <span>UI Gallery</span>
+        </div>
+        <h2 class="doc-h2">Application screen walkthrough</h2>
+        <p>
+          Screenshots of the working Nexos dashboard. Click any preview to open the full-resolution view.
+        </p>
+
+        <div class="grid-2">
+          <!-- 01 Kanban -->
+          <div class="feature-card">
+            <div class="gallery-thumb-wrap">
+              <img src="./01_Nexos-kanbaan.png" alt="Kanban board screen" class="lightbox-trigger" data-title="01 | Kanban board and task pipeline" width="1906" height="891" loading="lazy">
+              <div class="thumb-zoom-badge" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <span>Click to expand</span>
+              </div>
+            </div>
+            <div class="card-title">01 | Kanban board</div>
+            <p class="card-desc">
+              Three-column drag-and-drop board with priority badges, GitHub PR blockers, and countdown tags.
+            </p>
+          </div>
+
+          <!-- 02 Standup -->
+          <div class="feature-card">
+            <div class="gallery-thumb-wrap">
+              <img src="./02_Nexos-standupgen.png" alt="Standup generator screen" class="lightbox-trigger" data-title="02 | Standup generator" width="1913" height="893" loading="lazy">
+              <div class="thumb-zoom-badge" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <span>Click to expand</span>
+              </div>
+            </div>
+            <div class="card-title">02 | Standup generator</div>
+            <p class="card-desc">
+              Summarizes completed tasks into clean markdown format for async team updates.
+            </p>
+          </div>
+
+          <!-- 03 Settings -->
+          <div class="feature-card">
+            <div class="gallery-thumb-wrap">
+              <img src="./03_Nexos-Settings.png" alt="Settings screen" class="lightbox-trigger" data-title="03 | Settings and data options" width="1893" height="890" loading="lazy">
+              <div class="thumb-zoom-badge" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <span>Click to expand</span>
+              </div>
+            </div>
+            <div class="card-title">03 | Settings and backup</div>
+            <p class="card-desc">
+              Storage quota metrics, notification permissions, and single-click JSON export and import.
+            </p>
+          </div>
+
+          <!-- 04 Habit -->
+          <div class="feature-card">
+            <div class="gallery-thumb-wrap">
+              <img src="./04_Nexos-habittrack.png" alt="Habit tracker screen" class="lightbox-trigger" data-title="04 | Habit tracker and heatmap" width="1908" height="894" loading="lazy">
+              <div class="thumb-zoom-badge" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <span>Click to expand</span>
+              </div>
+            </div>
+            <div class="card-title">04 | Habit tracker heatmap</div>
+            <p class="card-desc">
+              Yearly contribution graph with active streak calculations and past-day editing support.
+            </p>
+          </div>
+
+          <!-- 05 AI Assistant -->
+          <div class="feature-card" style="grid-column: 1 / -1;">
+            <div class="gallery-thumb-wrap">
+              <img src="./05_Nexos-AI-Assistant.png" alt="AI assistant screen" class="lightbox-trigger" data-title="05 | AI assistant drawer" width="1920" height="884" loading="lazy">
+              <div class="thumb-zoom-badge" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <span>Click to expand</span>
+              </div>
+            </div>
+            <div class="card-title">05 | Context-aware AI assistant</div>
+            <p class="card-desc">
+              Slide-over chat drawer showing active task awareness and conversational action commands.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Security Matrix -->
+      <section id="section-security-matrix" class="doc-section">
+        <div class="section-eyebrow">
+          <span>Security</span>
+        </div>
+        <h2 class="doc-h2">Security model and audit notes</h2>
+        <p>
+          Comparing the local-first approach to traditional cloud SaaS tools, along with known limitations from our code review.
+        </p>
+
+        <div class="table-wrap">
+          <table aria-label="Security comparison table">
+            <thead>
+              <tr>
+                <th>Area</th>
+                <th>Cloud SaaS (Notion / Jira)</th>
+                <th>Nexos Local-First</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Data location</strong></td>
+                <td>Remote vendor database</td>
+                <td><span class="status-pill success">Local browser IndexedDB</span></td>
+              </tr>
+              <tr>
+                <td><strong>Offline support</strong></td>
+                <td>Limited or blocks edits</td>
+                <td><span class="status-pill success">100% functional offline</span></td>
+              </tr>
+              <tr>
+                <td><strong>Analytics scripts</strong></td>
+                <td>Telemetry and session recordings</td>
+                <td><span class="status-pill success">No tracking scripts</span></td>
+              </tr>
+              <tr>
+                <td><strong>Data backup</strong></td>
+                <td>CSV or proprietary export</td>
+                <td><span class="status-pill success">Raw JSON import and export</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-warning">
+          <svg class="callout-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <div class="callout-content">
+            <strong>Known constraints before production:</strong>
+            <ul style="margin-left: 1rem; margin-top: 0.25rem; line-height: 1.5;">
+              <li>CORS: The development PartyKit proxy uses <code>*</code> for origins. It needs an explicit origin whitelist.</li>
+              <li>GitHub token: The PAT for PR blocking is accessed client-side. A server-side OAuth flow is cleaner.</li>
+              <li>Secret in git history: Commit <code>004128a</code> contains a test API key that must be rewritten with <code>git-filter-repo</code> before making the repository public.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Interactive Calculator -->
+      <section id="section-interactive-calc" class="doc-section">
+        <div class="section-eyebrow">
+          <span>Sandbox</span>
+        </div>
+        <h2 class="doc-h2">Interactive XP simulator</h2>
+        <p>
+          Test how task completions and habit streaks calculate total XP and determine character level in Nexos.
+        </p>
+
+        <div class="interactive-card">
+          <div class="calc-header">
+            <span class="calc-title">XP calculation test</span>
+            <span class="status-pill success">Live calculation</span>
+          </div>
+
+          <div class="calc-grid">
+            <div class="calc-control">
+              <label for="calcHighTasks">High priority (50 XP)</label>
+              <input type="number" id="calcHighTasks" class="calc-input" min="0" max="50" value="3">
+            </div>
+            <div class="calc-control">
+              <label for="calcMedTasks">Medium priority (25 XP)</label>
+              <input type="number" id="calcMedTasks" class="calc-input" min="0" max="50" value="5">
+            </div>
+            <div class="calc-control">
+              <label for="calcLowTasks">Low priority (10 XP)</label>
+              <input type="number" id="calcLowTasks" class="calc-input" min="0" max="50" value="8">
+            </div>
+            <div class="calc-control">
+              <label for="calcHabitStreak">Habit streak (Days)</label>
+              <input type="number" id="calcHabitStreak" class="calc-input" min="0" max="365" value="14">
+            </div>
+          </div>
+
+          <div class="calc-results-panel">
+            <div class="calc-stat-box">
+              <span class="calc-stat-val" id="resTotalXP">0</span>
+              <span class="calc-stat-lbl">Total XP</span>
+            </div>
+            <div class="calc-stat-box">
+              <span class="calc-stat-val" id="resLevel">Lv. 1</span>
+              <span class="calc-stat-lbl">Level</span>
+            </div>
+            <div class="calc-stat-box">
+              <span class="calc-stat-val" id="resNextXP">0 XP</span>
+              <span class="calc-stat-lbl">Next tier</span>
+            </div>
+            <div class="calc-stat-box">
+              <span class="calc-stat-val" id="resMultiplier">1.28x</span>
+              <span class="calc-stat-lbl">Streak bonus</span>
+            </div>
+
+            <div class="xp-progress-bar-wrap">
+              <div style="display:flex; justify-content:space-between; font-size:0.72rem; font-family:var(--font-mono); margin-bottom:0.25rem; color:var(--text-dim);">
+                <span>Progress to next level</span>
+                <span id="resProgressPercent">0%</span>
+              </div>
+              <div class="xp-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                <div class="xp-progress-fill" id="resProgressFill"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Learnings -->
+      <section id="section-what-i-learned" class="doc-section">
+        <div class="section-eyebrow">
+          <span>Post-Mortem</span>
+        </div>
+        <h2 class="doc-h2">Engineering learnings and trade-offs</h2>
+        <p>
+          Practical lessons learned while restructuring the codebase and porting the signaling backend to PartyKit:
+        </p>
+
+        <div class="grid-2">
+          <div class="feature-card">
+            <div class="card-badge">Lesson 01</div>
+            <div class="card-title">Handshakes vs protocol compliance</div>
+            <p class="card-desc">
+              A WebSocket handshake returning HTTP 101 does not mean your sync logic works. PartyKit needed strict compliance with <code>y-webrtc</code> message types (<code>subscribe</code>, <code>publish</code>, <code>ping</code>).
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="card-badge">Lesson 02</div>
+            <div class="card-title">Dropping the sender in WebRTC pub/sub</div>
+            <p class="card-desc">
+              When broadcasting updates, the signaling relay must filter out the sender connection. Otherwise, clients process their own updates twice in an echo loop.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="card-badge">Lesson 03</div>
+            <div class="card-title">Tunneling the Vite dev server</div>
+            <p class="card-desc">
+              Testing on a phone through ngrok or Cloudflare tunnels failed because localhost on the phone resolved to itself. Adding <code>server.allowedHosts: true</code> solved it.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="card-badge">Lesson 04</div>
+            <div class="card-title">Vite preview proxy difference</div>
+            <p class="card-desc">
+              Proxy settings in <code>server.proxy</code> do not apply to <code>vite preview</code>. You must duplicate them under <code>preview.proxy</code> to test production builds locally.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="card-badge">Lesson 05</div>
+            <div class="card-title">Hybrid HTTP and WebSocket worker</div>
+            <p class="card-desc">
+              PartyKit handles standard HTTP <code>onFetch</code> alongside WebSockets. This let us keep the Express-style request format for <code>/api/chat</code> without a separate node process.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="card-badge">Lesson 06</div>
+            <div class="card-title">Linux IDE font manager crash</div>
+            <p class="card-desc">
+              Ubuntu's <code>fonts-symbola</code> package triggered a known Java <code>X11FontManager</code> bug that crashed WebStorm silently on startup. Purging the package fixed it.
+            </p>
+          </div>
+        </div>
+
+        <div class="callout callout-danger">
+          <svg class="callout-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <div class="callout-content">
+            <strong>Current status:</strong> The project was shelved on 2026-10-08 after the PartyKit build stalled on <code>@cloudflare/workerd-linux-64</code>. All components and characterization tests remain intact for future pickup.
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Right TOC -->
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <div class="toc-title">On this page</div>
+      <ul class="toc-list" id="tocList">
+        <li><a href="#section-why-built" class="toc-link active">Why Nexos was built</a></li>
+        <li><a href="#section-what-it-entails" class="toc-link">Capabilities and stack</a></li>
+        <li><a href="#section-gamification-growth" class="toc-link">XP and habit math</a></li>
+        <li><a href="#diagram-crdt-sync" class="toc-link">01. CRDT resolution</a></li>
+        <li><a href="#diagram-indexeddb" class="toc-link">02. IndexedDB storage</a></li>
+        <li><a href="#diagram-webrtc-signaling" class="toc-link">03. PartyKit signaling</a></li>
+        <li><a href="#diagram-dual-mode" class="toc-link">04. Dual workspaces</a></li>
+        <li><a href="#diagram-ai-workflow" class="toc-link">05. AI assistant loop</a></li>
+        <li><a href="#section-interface-gallery" class="toc-link">Screen gallery</a></li>
+        <li><a href="#section-security-matrix" class="toc-link">Security model</a></li>
+        <li><a href="#section-interactive-calc" class="toc-link">XP simulator</a></li>
+        <li><a href="#section-what-i-learned" class="toc-link">Learnings</a></li>
+      </ul>
+
+      <button class="back-to-top-btn" id="backToTopBtn" type="button" aria-label="Scroll back to top">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <line x1="12" y1="19" x2="12" y2="5"></line>
+          <polyline points="5 12 12 5 19 12"></polyline>
+        </svg>
+        <span>Top of page</span>
+      </button>
+    </aside>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="page-footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <p><strong>NEXOS PRODUCTIVITY PLATFORM</strong> &bull; Local-first CRDT architecture documentation</p>
+      </div>
+      <div class="footer-right">
+        <a href="#section-why-built">Overview</a>
+        <a href="#section-interface-gallery">Gallery</a>
+        <a href="#section-what-i-learned">Learnings</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Lightbox Modal -->
+  <div class="modal-overlay" id="lightboxModal" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title" id="lightboxTitle">Image Preview</span>
+        <button class="modal-close-btn" id="lightboxCloseBtn" type="button" aria-label="Close image preview">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <img id="lightboxImg" src="" alt="Expanded diagram or screenshot preview">
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Modal -->
+  <div class="search-modal" id="searchModal" role="dialog" aria-modal="true">
+    <div class="search-box-dialog">
+      <div class="search-box-header">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="commandSearchInput" class="search-box-input" placeholder="Search sections, diagrams, code…" autocomplete="off" aria-label="Search documentation dialog input">
+        <span class="kbd-shortcut">ESC</span>
+      </div>
+      <ul class="search-results-list" id="searchResultsList" role="listbox"></ul>
+      <div class="search-box-footer">
+        <span><kbd>&uarr;</kbd> <kbd>&darr;</kbd> to navigate, <kbd>&crarr;</kbd> to jump</span>
+        <span>Nexos docs</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Theme toggle
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    themeToggleBtn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      const target = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', target);
+      try {
+        localStorage.setItem('nexos-theme', target);
+      } catch (e) {}
+    });
+
+    // Mobile menu toggle
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const mainSidebar = document.getElementById('mainSidebar');
+    if (mobileMenuToggle && mainSidebar) {
+      mobileMenuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        mainSidebar.classList.toggle('open');
+      });
+
+      mainSidebar.querySelectorAll('.nav-item-link').forEach(link => {
+        link.addEventListener('click', () => {
+          if (window.innerWidth <= 900) mainSidebar.classList.remove('open');
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 900 && mainSidebar.classList.contains('open') && !mainSidebar.contains(e.target) && e.target !== mobileMenuToggle) {
+          mainSidebar.classList.remove('open');
+        }
+      });
+    }
+
+    // Sidebar filter
+    const sidebarFilterInput = document.getElementById('sidebarFilterInput');
+    if (sidebarFilterInput && mainSidebar) {
+      sidebarFilterInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        mainSidebar.querySelectorAll('.nav-list li').forEach(li => {
+          const text = li.textContent.toLowerCase();
+          li.style.display = text.includes(query) ? '' : 'none';
+        });
+      });
+    }
+
+    // Diagram tabs
+    document.querySelectorAll('.diagram-panel').forEach(panel => {
+      const tabs = panel.querySelectorAll('.diagram-tab-btn');
+      const panes = panel.querySelectorAll('.diagram-tab-pane');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const targetId = tab.getAttribute('data-target');
+          tabs.forEach(t => t.classList.remove('active'));
+          panes.forEach(p => p.classList.remove('active'));
+          tab.classList.add('active');
+          const targetPane = panel.querySelector('#' + targetId);
+          if (targetPane) targetPane.classList.add('active');
+        });
+      });
+    });
+
+    // Lightbox modal
+    const lightboxModal = document.getElementById('lightboxModal');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxTitle = document.getElementById('lightboxTitle');
+    const lightboxCloseBtn = document.getElementById('lightboxCloseBtn');
+
+    function openLightbox(src, title) {
+      lightboxImg.src = src;
+      lightboxTitle.textContent = title || 'Preview';
+      lightboxModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lightboxModal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('.lightbox-trigger').forEach(img => {
+      img.addEventListener('click', () => {
+        openLightbox(img.getAttribute('src'), img.getAttribute('data-title') || img.getAttribute('alt'));
+      });
+    });
+
+    if (lightboxCloseBtn) lightboxCloseBtn.addEventListener('click', closeLightbox);
+    lightboxModal.addEventListener('click', (e) => {
+      if (e.target === lightboxModal) closeLightbox();
+    });
+
+    // Copy to clipboard
+    document.querySelectorAll('.code-copy-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const text = btn.getAttribute('data-copy');
+        if (!text) return;
+        try {
+          await navigator.clipboard.writeText(text);
+          const orig = btn.textContent;
+          btn.textContent = 'Copied';
+          setTimeout(() => { btn.textContent = orig; }, 1500);
+        } catch (err) {}
+      });
+    });
+
+    // XP Calculator
+    function updateCalculator() {
+      const high = parseInt(document.getElementById('calcHighTasks').value, 10) || 0;
+      const med = parseInt(document.getElementById('calcMedTasks').value, 10) || 0;
+      const low = parseInt(document.getElementById('calcLowTasks').value, 10) || 0;
+      const streak = parseInt(document.getElementById('calcHabitStreak').value, 10) || 0;
+
+      const totalXP = (high * 50) + (med * 25) + (low * 10) + (streak * 15);
+      const level = Math.floor(Math.sqrt(totalXP / 100)) + 1;
+      const base = Math.pow(level - 1, 2) * 100;
+      const next = Math.pow(level, 2) * 100;
+      const pct = Math.min(100, Math.max(0, Math.round(((totalXP - base) / (next - base)) * 100)));
+
+      document.getElementById('resTotalXP').textContent = totalXP.toLocaleString();
+      document.getElementById('resLevel').textContent = 'Lv. ' + level;
+      document.getElementById('resNextXP').textContent = next.toLocaleString() + ' XP';
+      document.getElementById('resMultiplier').textContent = (1 + (streak * 0.02)).toFixed(2) + 'x';
+      document.getElementById('resProgressPercent').textContent = pct + '%';
+      document.getElementById('resProgressFill').style.width = pct + '%';
+    }
+
+    ['calcHighTasks', 'calcMedTasks', 'calcLowTasks', 'calcHabitStreak'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', updateCalculator);
+    });
+    updateCalculator();
+
+    // Search command palette
+    const searchTriggerBtn = document.getElementById('searchTriggerBtn');
+    const searchModal = document.getElementById('searchModal');
+    const commandSearchInput = document.getElementById('commandSearchInput');
+    const searchResultsList = document.getElementById('searchResultsList');
+
+    const searchIndex = [
+      { title: 'Why Nexos was built', hash: '#section-why-built', cat: 'Overview' },
+      { title: 'Capabilities and technology stack', hash: '#section-what-it-entails', cat: 'Stack' },
+      { title: 'XP formulas and habit math', hash: '#section-gamification-growth', cat: 'Math' },
+      { title: '01. CRDT state resolution', hash: '#diagram-crdt-sync', cat: 'CRDT' },
+      { title: '02. IndexedDB persistence', hash: '#diagram-indexeddb', cat: 'Storage' },
+      { title: '03. WebRTC and PartyKit signaling', hash: '#diagram-webrtc-signaling', cat: 'Signaling' },
+      { title: '04. Developer vs User workspaces', hash: '#diagram-dual-mode', cat: 'Workspaces' },
+      { title: '05. Context-aware AI assistant', hash: '#diagram-ai-workflow', cat: 'AI' },
+      { title: 'Application screen walkthrough (Gallery)', hash: '#section-interface-gallery', cat: 'Gallery' },
+      { title: 'Security model and audit notes', hash: '#section-security-matrix', cat: 'Security' },
+      { title: 'Interactive XP simulator', hash: '#section-interactive-calc', cat: 'Sandbox' },
+      { title: 'Engineering learnings and trade-offs', hash: '#section-what-i-learned', cat: 'Retrospective' }
+    ];
+
+    let searchIdx = 0;
+
+    function openSearch() {
+      searchModal.classList.add('active');
+      commandSearchInput.value = '';
+      searchIdx = 0;
+      renderSearch(searchIndex);
+      setTimeout(() => commandSearchInput.focus(), 50);
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSearch() {
+      searchModal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function renderSearch(items) {
+      if (items.length === 0) {
+        searchResultsList.innerHTML = `<li style="padding:0.75rem; text-align:center; color:var(--text-dim); font-size:0.8rem;">No matching sections found.</li>`;
+        return;
+      }
+      searchResultsList.innerHTML = items.map((item, i) => `
+        <li class="search-result-item ${i === searchIdx ? 'selected' : ''}">
+          <a href="${item.hash}">
+            <span>${item.title}</span>
+            <span style="font-size:0.68rem; font-family:var(--font-mono); color:var(--text-dim);">${item.cat}</span>
+          </a>
+        </li>
+      `).join('');
+
+      searchResultsList.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', closeSearch);
+      });
+    }
+
+    if (searchTriggerBtn) searchTriggerBtn.addEventListener('click', openSearch);
+
+    commandSearchInput.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      searchIdx = 0;
+      if (!q) { renderSearch(searchIndex); return; }
+      renderSearch(searchIndex.filter(it => it.title.toLowerCase().includes(q) || it.cat.toLowerCase().includes(q)));
+    });
+
+    commandSearchInput.addEventListener('keydown', (e) => {
+      const items = searchResultsList.querySelectorAll('.search-result-item');
+      if (items.length === 0) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        searchIdx = (searchIdx + 1) % items.length;
+        items.forEach((it, i) => it.classList.toggle('selected', i === searchIdx));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        searchIdx = (searchIdx - 1 + items.length) % items.length;
+        items.forEach((it, i) => it.classList.toggle('selected', i === searchIdx));
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        items[searchIdx]?.querySelector('a')?.click();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchModal.classList.contains('active') ? closeSearch() : openSearch();
+      } else if (e.key === 'Escape') {
+        if (searchModal.classList.contains('active')) closeSearch();
+        if (lightboxModal.classList.contains('active')) closeLightbox();
+      }
+    });
+
+    searchModal.addEventListener('click', (e) => {
+      if (e.target === searchModal) closeSearch();
+    });
+
+    const backToTopBtn = document.getElementById('backToTopBtn');
+    if (backToTopBtn) {
+      backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    // Scroll spy
+    const sections = document.querySelectorAll('.doc-section');
+    const tocLinks = document.querySelectorAll('.toc-link');
+    const sidebarLinks = document.querySelectorAll('.nav-item-link');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('id');
+          tocLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + id));
+          sidebarLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + id));
+        }
+      });
+    }, { rootMargin: '-60px 0px -70% 0px' });
+
+    sections.forEach(s => observer.observe(s));
+  </script>
+</body>
+</html>
+'''
+
+def main():
+    target = "/home/ad/Documents/Nexos_Documentation/index.html"
+    with open(target, "w", encoding="utf-8") as f:
+        f.write(HTML_CONTENT.strip() + "\n")
+    print(f"Updated {target} with humanized, responsive content and compact images.")
+
+if __name__ == "__main__":
+    main()
